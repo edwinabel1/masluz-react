@@ -22,28 +22,49 @@ code {
 /* 深色主题下的日历样式 */
 .custom-calendar {
   @apply bg-darkCard text-darkText;
+  border: 1px solid #1f4068; /* 深色边框 */
 }
 
+/* 调整日期单元格 */
 .custom-calendar .react-calendar__tile {
   background-color: #16213e;
   color: #e0e0e0;
   border: 1px solid #1f4068;
 }
 
+/* 活动日期单元格 */
 .custom-calendar .react-calendar__tile--active {
   background-color: #0f3460;
   color: #ffffff;
 }
 
+/* 当前日期单元格 */
 .custom-calendar .react-calendar__tile--now {
   background-color: #3282b8;
   color: #ffffff;
 }
 
+/* 星期标题样式 */
 .custom-calendar .react-calendar__month-view__weekdays {
   color: #e0e0e0;
 }
 
+/* 日历表头（年份和月份）样式 */
+.custom-calendar .react-calendar__navigation {
+  background-color: #16213e; /* 深色背景 */
+  color: #e0e0e0; /* 浅色文字 */
+  border-bottom: 1px solid #1f4068; /* 添加下边框 */
+}
+
+/* 表头按钮样式 */
 .custom-calendar .react-calendar__navigation button {
   color: #e0e0e0;
+  background-color: #16213e; /* 使按钮与表头一致 */
+  border: none; /* 移除按钮边框 */
+}
+
+/* 表头按钮悬停效果 */
+.custom-calendar .react-calendar__navigation button:hover {
+  background-color: #0f3460;
+  color: #ffffff;
 }
