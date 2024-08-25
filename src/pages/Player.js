@@ -7,6 +7,7 @@ function Player() {
   const [subtitles, setSubtitles] = useState([]);
   const [currentSubtitle, setCurrentSubtitle] = useState('');
   const [photos, setPhotos] = useState([]);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0); // 当前照片索引
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -81,6 +82,14 @@ function Player() {
     return () => clearInterval(interval);
   }, [subtitles]);
 
+  const handleNextPhoto = () => {
+    setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length);
+  };
+
+  const handlePrevPhoto = () => {
+    setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length);
+  };
+
   return (
     <div className="player-container bg-gray-900 text-white min-h-screen p-4">
       <h1 className="text-3xl font-bold mb-4">课程播放</h1>
@@ -96,12 +105,27 @@ function Player() {
         <p className="text-xl">{currentSubtitle}</p>
       </div>
 
-      <div className="blackboard-container grid grid-cols-2 gap-4">
-        {photos.map((photo) => (
-          <div key={photo.key} className="photo-item">
-            <img src={`https://masluz-api.edwin-abel-3.workers.dev${photo.url}`} alt="Blackboard" className="w-full h-auto rounded shadow-lg" />
-          </div>
-        ))}
+      <div className="blackboard-container flex flex-col items-center">
+        <div className="relative w-full max-w-2xl flex justify-between items-center mb-4">
+          <button onClick={handlePrevPhoto} className="bg-gray-700 text-white p-2 rounded-l">
+            ◀
+          </button>
+          {photos.length > 0 && (
+            <div className="text-center text-gray-400 absolute bottom-2 left-1/2 transform -translate-x-1/2">
+              {`Photo ${currentPhotoIndex + 1} of ${photos.length}`}
+            </div>
+          )}
+          <button onClick={handleNextPhoto} className="bg-gray-700 text-white p-2 rounded-r">
+            ▶
+          </button>
+        </div>
+        {photos.length > 0 && (
+          <img
+            src={`https://masluz-api.edwin-abel-3.workers.dev${photos[currentPhotoIndex].url}`}
+            alt="Blackboard"
+            className="w-full max-h-[calc(100vh-300px)] object-contain"
+          />
+        )}
       </div>
     </div>
   );
