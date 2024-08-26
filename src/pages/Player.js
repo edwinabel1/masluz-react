@@ -64,6 +64,24 @@ function Player() {
     return () => clearInterval(interval);
   }, [subtitles]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault(); // 阻止默认 Tab 行为
+        if (audioRef.current.paused) {
+          audioRef.current.play();
+        } else {
+          audioRef.current.pause();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const handleNextPhoto = () => {
     setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length);
   };
@@ -73,7 +91,11 @@ function Player() {
   };
 
   const handleSendSubtitle = (newSubtitle) => {
-    setSubtitles([...subtitles, newSubtitle]);
+    setSubtitles((prevSubtitles) => [...prevSubtitles, newSubtitle]);
+  };
+
+  const handleDeleteSubtitle = (subtitleId) => {
+    setSubtitles((prevSubtitles) => prevSubtitles.filter(sub => sub.id !== subtitleId));
   };
 
   return (
@@ -117,6 +139,7 @@ function Player() {
         <SubtitleSidebar
           subtitles={subtitles}
           onSendSubtitle={handleSendSubtitle}
+          onDeleteSubtitle={handleDeleteSubtitle}
           audioRef={audioRef}
           courseId={courseId}
         />
