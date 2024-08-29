@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-function SubtitleSidebar({ subtitles, onSendSubtitle, onDeleteSubtitle, audioRef, courseId }) {
+function SubtitleSidebar({ subtitles, onSendSubtitle, onDeleteSubtitle, onSubtitleClick, audioRef, courseId }) {
   const [newSubtitle, setNewSubtitle] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(null);
@@ -105,6 +105,7 @@ function SubtitleSidebar({ subtitles, onSendSubtitle, onDeleteSubtitle, audioRef
           <div
             key={sub.id || `temp_${index}`} // 确保 key 唯一性
             className={`mb-2 p-2 rounded flex justify-between items-center ${index === currentSubtitleIndex ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'}`}
+			onClick={() => onSubtitleClick(sub.start_time)} // 点击字幕调整播放进度
           >
             <div>
               <p className="text-sm">{sub.text}</p>

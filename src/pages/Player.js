@@ -81,6 +81,13 @@ function Player() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+  
+  const handleSubtitleClick = (startTime) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = startTime;
+      audioRef.current.play();  // 自动播放点击的那一句
+    }
+  };
 
   const handleNextPhoto = () => {
     setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length);
@@ -140,6 +147,7 @@ function Player() {
           subtitles={subtitles}
           onSendSubtitle={handleSendSubtitle}
           onDeleteSubtitle={handleDeleteSubtitle}
+		  onSubtitleClick={handleSubtitleClick}
           audioRef={audioRef}
           courseId={courseId}
         />
