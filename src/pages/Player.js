@@ -64,14 +64,24 @@ function Player() {
     return () => clearInterval(interval);
   }, [subtitles]);
 
+  // Handle Tab key for play/pause
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Tab key to pause/play
       if (e.key === 'Tab') {
         e.preventDefault(); // 阻止默认 Tab 行为
         if (audioRef.current.paused) {
           audioRef.current.play();
         } else {
           audioRef.current.pause();
+        }
+      }
+
+      // Alt + 左箭头 倒回 10 秒
+      if (e.altKey && e.key === 'ArrowLeft') {
+        e.preventDefault(); // 阻止浏览器的返回行为
+        if (audioRef.current) {
+          audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10); // 倒回10秒
         }
       }
     };
@@ -81,7 +91,7 @@ function Player() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-  
+
   const handleSubtitleClick = (startTime) => {
     if (audioRef.current) {
       audioRef.current.currentTime = startTime;
@@ -109,7 +119,7 @@ function Player() {
     <div className="player-container bg-gray-900 text-white h-screen flex overflow-hidden">
       <div className="w-2/3 pr-4 flex flex-col h-full">
         <h1 className="text-3xl font-bold mb-4">课程播放</h1>
-        <p className="mb-4">正在播放课程 ID: {courseId} (提示:使用Tab键快速暂停或继续播放)</p>
+        <p className="mb-4">正在播放课程 ID: {courseId} (提示:使用Tab键快速暂停或继续播放,Alt+左箭头倒回10秒)</p>
 
         <div className="audio-controls mb-4">
           <audio ref={audioRef} src={audioUrl} controls className="w-full">
@@ -147,7 +157,7 @@ function Player() {
           subtitles={subtitles}
           onSendSubtitle={handleSendSubtitle}
           onDeleteSubtitle={handleDeleteSubtitle}
-		  onSubtitleClick={handleSubtitleClick}
+          onSubtitleClick={handleSubtitleClick}
           audioRef={audioRef}
           courseId={courseId}
         />
