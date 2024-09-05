@@ -1,4 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
+// 辅助函数：将秒数转换为 hh:mm:ss 格式
+const formatTime = (seconds) => {
+  const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+  const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+  const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+  return `${h}:${m}:${s}`;
+};
 
 function SubtitleSidebar({ subtitles, onSendSubtitle, onDeleteSubtitle, onSubtitleClick, audioRef, courseId }) {
   const [newSubtitle, setNewSubtitle] = useState('');
@@ -6,6 +14,7 @@ function SubtitleSidebar({ subtitles, onSendSubtitle, onDeleteSubtitle, onSubtit
   const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [subtitleToDelete, setSubtitleToDelete] = useState(null);
+  const bottomRef = useRef(null); // 用于引用列表的底部
 
   const handleInputChange = (e) => {
     setNewSubtitle(e.target.value);
@@ -58,7 +67,7 @@ function SubtitleSidebar({ subtitles, onSendSubtitle, onDeleteSubtitle, onSubtit
 
   const handleDelete = async () => {
     if (!subtitleToDelete) return;
-    
+
     try {
       const response = await fetch(`https://masluz-api.edwin-abel-3.workers.dev/api/delete-subtitle?id=${subtitleToDelete}`, {
         method: 'DELETE',
@@ -84,6 +93,13 @@ function SubtitleSidebar({ subtitles, onSendSubtitle, onDeleteSubtitle, onSubtit
     }
   };
 
+  // 自动滚动到最新字幕
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [subtitles]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (audioRef.current) {
@@ -104,23 +120,25 @@ function SubtitleSidebar({ subtitles, onSendSubtitle, onDeleteSubtitle, onSubtit
         {subtitles.map((sub, index) => (
           <div
             key={sub.id || `temp_${index}`} // 确保 key 唯一性
-            className={`mb-2 p-2 rounded flex justify-between items-center ${index === currentSubtitleIndex ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'}`}
-			onClick={() => onSubtitleClick(sub.start_time)} // 点击字幕调整播放进度
+            className={`mb-2 p-2 rounded flex justify-between items-center cursor-pointer ${index === currentSubtitleIndex ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'}`}
+            onClick={() => onSubtitleClick(sub.start_time)} // 点击字幕调整播放进度
           >
             <div>
               <p className="text-sm">{sub.text}</p>
               <p className="text-xs text-gray-400">
-                {`Start: ${sub.start_time ? sub.start_time.toFixed(2) : 'N/A'}s, End: ${sub.end_time ? sub.end_time.toFixed(2) : 'N/A'}s`}
+                {`Start: ${sub.start_time ? formatTime(sub.start_time) : 'N/A'}, End: ${sub.end_time ? formatTime(sub.end_time) : 'N/A'}`}
               </p>
             </div>
             <button
-              onClick={() => confirmDelete(sub.id)}
+              onClick={(e) => { e.stopPropagation(); confirmDelete(sub.id); }} // 阻止事件冒泡
               className="ml-2 text-red-500 hover:text-red-700"
             >
               🗑️
             </button>
           </div>
         ))}
+        {/* 滚动至底部的参考点 */}
+        <div ref={bottomRef}></div>
       </div>
       <div className="flex items-center">
         <input
@@ -129,6 +147,7 @@ function SubtitleSidebar({ subtitles, onSendSubtitle, onDeleteSubtitle, onSubtit
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="输入字幕..."
+		  spellCheck={false}  // 禁用拼写检查
           className="w-full p-2 rounded-l bg-gray-700 text-white"
         />
         <button
