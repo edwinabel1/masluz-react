@@ -241,10 +241,11 @@ function Player() {
           />
         )}
         {activeSidebar === 'courseInfo' && (
-          <CourseInfoSidebar
-            courseInfo={courseInfo}
-            onSaveCourseInfo={handleSaveCourseInfo}
-          />
+<CourseInfoSidebar
+  courseInfo={courseInfo}
+  onSaveCourseInfo={handleSaveCourseInfo}
+  courseId={courseId} // 传递 courseId
+/>
         )}
         {activeSidebar === 'vocabulary' && (
           <VocabularySidebar
