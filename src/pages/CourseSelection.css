@@ -45,15 +45,8 @@ button:hover {
     flex-direction: column;
   }
 
-  .w-1/2 {
-    width: 100%;
-    padding: 0;
-  }
-
-  .pr-4,
-  .pl-4 {
-    padding: 0;
-  }
+  /* 移除 .w-1/2 类的样式 */
+  /* 如果之前有定义，确保删除或注释掉 */
 }
 
 /* 优化滚动条样式（可选） */

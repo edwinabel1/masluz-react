@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './CourseSelection.css'; // 保留用于自定义样式
 import { Link } from 'react-router-dom';
+import { FaFileAudio, FaCheckCircle, FaStar } from 'react-icons/fa'; // 导入 FaStar
 
 function CourseSelection() {
   const [selectedDate, setSelectedDate] = useState(new Date()); // 选中的月份和年份
@@ -115,8 +116,10 @@ function CourseSelection() {
       <ul className="text-sm space-y-2">
         {courses.map(course => (
           <li key={course.key} className="flex flex-col p-2 bg-gray-700 rounded hover:bg-gray-600">
-            <Link to={`/player/${course.key}`} className="text-blue-400 hover:underline">
+            <Link to={`/player/${course.key}`} className="flex items-center text-blue-400 hover:underline">
               {course.title ? course.title : course.key}
+              {/* 如果是已处理课程，添加五角星图标 */}
+              {type === 'processed' && <FaStar className="ml-2 text-yellow-400" />}
             </Link>
             <span className="text-gray-500 text-sm">
               {course.teacherName ? `教师: ${course.teacherName}` : ''}
@@ -212,74 +215,87 @@ function CourseSelection() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 min-h-screen bg-gray-900 text-white">
-      <div className="w-full max-w-4xl bg-gray-800 p-6 shadow-lg rounded-lg h-full flex flex-col">
-        {/* 搜索框 */}
-        <div className="mb-4 flex items-center">
-          <input
-            type="text"
-            placeholder="搜索课程标题或教师姓名"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-grow p-2 border border-gray-700 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="ml-2 p-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              清除
-            </button>
-          )}
-        </div>
-
-        {/* 月份和年份选择 */}
-        <div className="mb-4 flex space-x-4">
-          {/* 选择月份 */}
-          <div className="w-1/2">
-            <label className="block text-sm font-medium text-gray-300 mb-1">选择月份:</label>
-            <select
-              value={selectedDate.getMonth()}
-              onChange={handleMonthChange}
-              className="w-full p-2 border border-gray-700 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-            >
-              {[
-                'January', 'February', 'March', 'April',
-                'May', 'June', 'July', 'August',
-                'September', 'October', 'November', 'December'
-              ].map((month, index) => (
-                <option key={month} value={index}>{month}</option>
-              ))}
-            </select>
+    <div className="flex flex-col h-screen bg-gray-900 text-white">
+      <div className="flex-grow overflow-auto p-4">
+        <div className="w-full max-w-4xl mx-auto bg-gray-800 p-6 shadow-lg rounded-lg flex flex-col h-full">
+          {/* 搜索框 */}
+          <div className="mb-4 flex items-center">
+            <input
+              type="text"
+              placeholder="搜索课程标题或教师姓名"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-grow p-2 border border-gray-700 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="ml-2 p-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                清除
+              </button>
+            )}
           </div>
 
-          {/* 选择年份 */}
-          <div className="w-1/2">
-            <label className="block text-sm font-medium text-gray-300 mb-1">选择年份:</label>
-            <select
-              value={selectedDate.getFullYear()}
-              onChange={handleYearChange}
-              className="w-full p-2 border border-gray-700 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-            >
-              {getYears().map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* 课程显示 */}
-        <div className="flex flex-grow space-y-4 md:space-y-0 md:space-x-4 overflow-auto">
-          {/* 未处理音频 */}
-          <div className="w-full md:w-1/2">
-            <h3 className="text-lg font-semibold mb-2 text-blue-400">未处理音频</h3>
-            {renderCoursesList(filteredUnprocessedCourses, 'unprocessed')}
+          {/* 显示当前过滤状态 */}
+          <div className="mb-2 text-gray-400">
+            {searchQuery.trim() !== '' 
+              ? `搜索关键词: "${searchQuery}"`
+              : `过滤条件: ${selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' })}`}
           </div>
 
-          {/* 已处理课程 */}
-          <div className="w-full md:w-1/2">
-            <h3 className="text-lg font-semibold mb-2 text-blue-400">已处理课程</h3>
-            {renderCoursesList(filteredProcessedCourses, 'processed')}
+          {/* 月份和年份选择 */}
+          <div className="mb-4 flex space-x-4">
+            {/* 选择月份 */}
+            <div className="w-1/2">
+              <label className="block text-sm font-medium text-gray-300 mb-1">选择月份:</label>
+              <select
+                value={selectedDate.getMonth()}
+                onChange={handleMonthChange}
+                className="w-full p-2 border border-gray-700 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              >
+                {[
+                  'January', 'February', 'March', 'April',
+                  'May', 'June', 'July', 'August',
+                  'September', 'October', 'November', 'December'
+                ].map((month, index) => (
+                  <option key={month} value={index}>{month}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* 选择年份 */}
+            <div className="w-1/2">
+              <label className="block text-sm font-medium text-gray-300 mb-1">选择年份:</label>
+              <select
+                value={selectedDate.getFullYear()}
+                onChange={handleYearChange}
+                className="w-full p-2 border border-gray-700 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              >
+                {getYears().map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* 课程显示 */}
+          <div className="flex flex-grow space-y-4 md:space-y-0 md:space-x-4">
+            {/* 未处理音频 */}
+            <div className="w-full md:w-1/2">
+              <h3 className="text-lg font-semibold mb-2 text-blue-400 flex items-center">
+                <FaFileAudio className="mr-2" /> 未处理音频
+              </h3>
+              {renderCoursesList(filteredUnprocessedCourses, 'unprocessed')}
+            </div>
+
+            {/* 已处理课程 */}
+            <div className="w-full md:w-1/2">
+              <h3 className="text-lg font-semibold mb-2 text-blue-400 flex items-center">
+                <FaCheckCircle className="mr-2" /> 已处理课程
+              </h3>
+              {renderCoursesList(filteredProcessedCourses, 'processed')}
+            </div>
           </div>
         </div>
       </div>
